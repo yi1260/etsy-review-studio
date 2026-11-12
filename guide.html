@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 ways to get your Etsy reviews into a spreadsheet (and what each one drops)</title>
+<meta name="description" content="A practical comparison of Etsy's official review download, Judge.me's free Etsy sync, a manual CSV and a portable structured CSV export — including the exact 13-column schema and FTC attribution rules.">
+<link rel="canonical" href="https://yi1260.github.io/etsy-review-studio/guide.html">
+<meta property="og:title" content="4 ways to get your Etsy reviews into a spreadsheet"><meta property="og:type" content="article">
+<meta property="og:url" content="https://yi1260.github.io/etsy-review-studio/guide.html"><meta property="og:image" content="https://yi1260.github.io/etsy-review-studio/export-preview.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%236D3FE0'/%3E%3Ctext x='32' y='45' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='white'%3ER%3C/text%3E%3C/svg%3E">
+<style>:root{--violet:#6D3FE0;--ink:#16131F;--muted:#5F5A6E}body{max-width:800px;margin:0 auto;padding:0 24px 90px;font:17px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink)}header{padding:38px 0 22px;border-bottom:1px solid #E7E3EF;margin-bottom:34px}a{color:var(--violet)}h1{font-size:36px;line-height:1.2;letter-spacing:-.03em}h2{font-size:24px;margin-top:44px;letter-spacing:-.02em}h3{font-size:19px}code{background:#F3EFFC;padding:2px 6px;border-radius:5px;font-size:.9em}pre{background:#F7F5FC;border:1px solid #E7E3EF;border-radius:12px;padding:18px;overflow:auto;line-height:1.6}pre code{background:none;padding:0}table{border-collapse:collapse;width:100%;margin:20px 0;font-size:15px}th,td{border:1px solid #E7E3EF;padding:9px 12px;text-align:left}th{background:#F7F5FC}hr{border:0;border-top:1px solid #E7E3EF;margin:38px 0}.disclosure{background:#F7F5FC;border-left:3px solid var(--violet);padding:16px 20px;border-radius:0 10px 10px 0;font-size:15px;color:var(--muted)}.cta{margin-top:44px;padding:26px;background:#F3EFFC;border-radius:16px;text-align:center}.btn{display:inline-block;background:var(--violet);color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:650}footer{margin-top:60px;padding-top:20px;border-top:1px solid #E7E3EF;color:var(--muted);font-size:14px}</style></head><body>
+<header><a href="index.html">← Etsy Review Studio</a> · <span style="color:var(--muted)">Free guide</span></header>
+<article>
+<p>If you're moving an Etsy shop to Shopify, archiving a shop you're closing, or switching review apps, at some point you'll want your reviews in a file you control.</p>
+<p>There are four realistic routes. Two of them are free and official, and you should try those first. This post is mostly about knowing what each route leaves behind, because finding that out <em>after</em> a migration is the expensive part.</p>
+<h2>1. Etsy's own "Download Your Reviews" (free, start here)</h2>
+<p>Etsy does let sellers download their reviews:</p>
+<p><code>Shop Manager → Settings → Options → Download Data → Take your data with you → Download Your Reviews</code></p>
+<p>It's a data request rather than an instant export, and the prepared link expires — re-generate it instead of relying on an old one.</p>
+<p>The catch: Etsy's help article doesn't publish the column list or format. Open the file in a spreadsheet <strong>before</strong> you plan anything around it, and check specifically for:</p>
+<ul><li>the review body and date</li><li>your <strong>seller replies</strong></li><li>the <strong>original full-resolution buyer photo URLs</strong> (not thumbnails)</li><li>the <strong>listing URL / handle</strong> each review belongs to</li></ul>
+<p>If all four are there and you just wanted a copy, you're done. No tool needed.</p>
+<h2>2. Judge.me's free Etsy sync (free, if you use Judge.me)</h2>
+<p>If your destination is Judge.me on Shopify, its official Etsy integration syncs reviews automatically, roughly weekly, on the free plan. It's the right tool for that job and it's genuinely the least work.</p>
+<p>Its published scope is narrower than "all my reviews", though. It covers your own active listings with written reviews, and Etsy-synced reviews are excluded from Judge.me's Google Shopping product-ratings feed. Rating-only reviews, seller replies and inactive listings are the usual gaps people notice. It also doesn't give you a portable file — the data lives inside the app.</p>
+<h2>3. A manual CSV (free, but tedious)</h2>
+<p>You can assemble the file yourself. The minimum viable mapping is:</p>
+<table><thead><tr><th>Column</th><th>What to watch</th></tr></thead><tbody><tr><td><code>rating</code></td><td>1–5 as a number, not stars</td></tr><tr><td><code>body</code></td><td>Preserve line breaks; escape commas and quotes</td></tr><tr><td><code>review_date</code></td><td>ISO <code>YYYY-MM-DD</code> avoids locale surprises</td></tr><tr><td><code>reviewer_name</code></td><td>Display name, not email (you usually don't have it)</td></tr><tr><td><code>product_handle</code></td><td>Must match the Shopify handle exactly, or the import silently drops rows</td></tr><tr><td><code>picture_urls</code></td><td>Full-resolution URLs; first URL only for some apps</td></tr><tr><td><code>reply</code></td><td>Your seller response, if you want to keep it</td></tr></tbody></table>
+<p>Two things consistently go wrong here: handles that don't match, and photos that were copied as preview-size URLs. Do a 5-row test import before doing 500.</p>
+<h2>4. A portable CSV snapshot (structured, repeatable)</h2>
+<p>This is the case for a dedicated export: you want a documented schema, filters, and a file you can re-generate whenever you like. For reference, here is the exact 13-column Standard CSV written by the tool I build:</p>
+<pre><code>transaction_id, review_date, rating, reviewer_name, body,
+photo_count, picture_urls, verified_buyer, product_id,
+product_handle, product_title, product_url, seller_reply</code></pre>
+<p>If you're evaluating <em>any</em> export tool, ask for its column list up front. "Exports your reviews" without a schema is how you discover six months later that seller replies or original photo URLs were never in the file.</p>
+<p>Three properties worth insisting on:</p>
+<ul><li><strong>Local processing</strong> — the data never needs to touch someone else's server</li><li><strong>Repeatable snapshots</strong> — same schema every run, so your import mapping doesn't break</li><li><strong>Filters</strong> — rating-only, photo-only, whole shop vs single listing</li></ul>
+<h2>The part people get wrong: whose reviews are these?</h2>
+<p>If you import reviews, keep them attributed to their real source and to your own shop's buyers. Under the US FTC's Rule on Consumer Reviews and Testimonials (16 CFR Part 465, effective October 2024), presenting another seller's customers' feedback as your own, or reusing a review written for a different product or seller, is prohibited.</p>
+<p>Public reviews on someone else's shop are great for <strong>research</strong> — reading what buyers complain about, or ranking a shop's listings by review volume before you decide what to make. They are not your social proof. This distinction matters more than any CSV column.</p>
+<h2>A short checklist before you migrate</h2>
+<ol><li>Generate the official Etsy download and actually open it.</li><li>Write down which of the four field groups are missing.</li><li>Do a 5-row test import into your destination app and verify photos + replies render.</li><li>Keep the original file somewhere outside the browser's Downloads folder.</li><li>Only then run the full migration.</li></ol>
+<hr>
+<p><em>Disclosure: I build <a href="https://yi1260.github.io/etsy-review-studio/?utm_source=devto&utm_campaign=csv-guide" rel="noopener">Etsy Review Studio</a>, a small independent Chrome extension that generates the structured CSV described in route 4 (free tier: 40 reviews). It is not affiliated with Etsy, Shopify, Judge.me or Loox. If the official download or the free Judge.me sync covers your case, use those instead — this post works fine without installing anything.</em></p>
+</article>
+<div class="cta"><p style="margin:0 0 14px"><strong>Want a repeatable CSV with a documented schema?</strong> Review Studio generates it locally in Chrome. Free tier: 40 reviews.</p><a class="btn" href="index.html?utm_source=guide&amp;utm_campaign=csv-guide">See the tool &amp; the exact column list →</a></div>
+<footer>Independent tool. Not affiliated with Etsy, Shopify, Judge.me or Loox. · <a href="privacy.html">Privacy</a> · <a href="index.html">Home</a></footer>
+</body></html>
